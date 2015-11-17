@@ -23,14 +23,14 @@ import java.util.ArrayList;
 
 
 public class AccelerometerTesting extends AppCompatActivity implements SensorEventListener {
-    private ArrayList<EventData> accList = new ArrayList<>();
-    private ArrayList<EventData> magList = new ArrayList<>();
+    private DataSet accReading = new DataSet("Accelerometer");
+    private DataSet magReading = new DataSet("Magnetic Field");
 
     private int startIndex = 0;
     private int endIndex = 0;
 
 
-    private SensorManager sensorManager ;
+    private SensorManager sensorManager;
     private TextView view;
 
     @Override
@@ -68,34 +68,34 @@ public class AccelerometerTesting extends AppCompatActivity implements SensorEve
     }
 
     public void onSensorChanged(SensorEvent event) {
-            if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-                synchronized (this) {
-                    accList.add(new EventData(event));
-                }
-            } else if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
-                synchronized (this){
-                    magList.add(new EventData(event));
-                }
+        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+            synchronized (event) {
+                accReading.addData(event);
             }
+        } else if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
+            synchronized (event) {
+                magReading.addData(event);
+            }
+        }
     }
 
 //    public void processData(int startIndex, int endIndex) {
 ////        Taking first value as gravity benchmark
-//        float[] gravity = accList.get(startIndex).getValues();
-//        long lastDataTime = accList.get(startIndex).getTimestamp();
-//        final double azimuthOffset = getOriInc(gravity, magList.get(startIndex).getValues())[0];
+//        float[] gravity = accReading.get(startIndex).getValues();
+//        long lastDataTime = accReading.get(startIndex).getTimestamp();
+//        final double azimuthOffset = getOriInc(gravity, magReading.get(startIndex).getValues())[0];
 //
 //        for (startIndex++; startIndex <= endIndex; startIndex++) {
-//            final long lapseTime = accList.get(startIndex).getTimestamp() - lastDataTime;
+//            final long lapseTime = accReading.get(startIndex).getTimestamp() - lastDataTime;
 //
-//            float[] linAccVal = accList.get(startIndex).getValues();
+//            float[] linAccVal = accReading.get(startIndex).getValues();
 ////            get linear acceleration values (raw - gravity)
 //            for (int i = 0; i < 3; i++) {
 //                linAccVal[i] -= gravity[i];
 //            }
 //
 ////            get raw magnetic field value
-//            final float[] magVal = magList.get(startIndex).getValues();
+//            final float[] magVal = magReading.get(startIndex).getValues();
 //
 ////            [0] rotation from North (degree), [1] cos(pitch angel)
 //            final double[] oriInc = getOriInc(gravity, magVal);
@@ -261,28 +261,19 @@ public class AccelerometerTesting extends AppCompatActivity implements SensorEve
         sensorManager.unregisterListener(this);
         TextView t = (TextView) findViewById(R.id.textView2);
         t.setText("Pausing Sensor");
-        File file = new File(Environment.getExternalStorageDirectory() + Constants.MAGLOG);
-        if(!file.delete())
-            Log.i("Delete","MagLog delete failed");
+        File file = new File("/sdcard/" + Constants.MAGLOG);
+        if (!file.delete())
+            Log.i("Delete", "MagLog delete failed");
         file = new File("/sdcard/" + Constants.ACCLOG);
-        if(!file.delete())
-            Log.i("Delete","AccLog delete failed");
-        appendLog("Type|Timestamp|x-value|y-value|z-value", Constants.MAGLOG);
-        for(EventData data: magList) {
-            appendLog(data.toString(), Constants.MAGLOG);
-        }
-
-        appendLog("Type|Timestamp|x-value|y-value|z-value", Constants.ACCLOG);
-        for(EventData data: accList){
-            appendLog(data.toString(), Constants.ACCLOG);
-        }
-
-        magList.clear();
-        accList.clear();
+        if (!file.delete())
+            Log.i("Delete", "AccLog delete failed");
+//        TODO: Log the data
+        appendLog(magReading.printToString(), Constants.MAGLOG);
+        appendLog(accReading.printToString(), Constants.ACCLOG);
     }
 
     public void appendLog(String text, String filename) {
-        File logFile = new File("sdcard/"+filename);
+        File logFile = new File("sdcard/" + filename);
 //        File logFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) + "/test.txt");
         if (!logFile.exists()) {
             try {
@@ -307,7 +298,6 @@ public class AccelerometerTesting extends AppCompatActivity implements SensorEve
 //    private double determineDirection(double direction){
 //
 //    }
-
 
 
 }
