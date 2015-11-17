@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Motion Sensor Test</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="change_color">Shake to change color</string>
+    <string name="resume_sensor">Resume Sensor</string>
+    <string name="pause_sensor">Pause Sensor</string>
+</resources>
