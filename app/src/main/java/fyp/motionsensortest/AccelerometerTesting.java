@@ -5,7 +5,6 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -19,7 +18,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 
 
 public class AccelerometerTesting extends AppCompatActivity implements SensorEventListener {
@@ -270,6 +268,9 @@ public class AccelerometerTesting extends AppCompatActivity implements SensorEve
 //        TODO: Log the data
         appendLog(magReading.printToString(), Constants.MAGLOG);
         appendLog(accReading.printToString(), Constants.ACCLOG);
+
+        accReading = new DataSet("Accelerometer");
+        magReading = new DataSet("Magnetic Field");
     }
 
     public void appendLog(String text, String filename) {
